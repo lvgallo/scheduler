@@ -3,7 +3,7 @@ import axios from "axios";
 import "components/Application.scss";
 import DayList from "components/DayList.js";
 import Appointment from "components/Appointment";
-import { getAppointmentsForDay, getInterview , getInterviewersForDay} from "./helpers/selectors";
+import { getAppointmentsForDay, getInterview, getInterviewersForDay } from "./helpers/selectors";
 
 export default function Application(props) {
   const [state, setState] = useState({
@@ -26,20 +26,56 @@ export default function Application(props) {
       .then((all) => {
         setState(prev => ({ ...prev, days: all[0].data, appointments: all[1].data, interviewers: all[2].data }));
       });
-  });
-  
+  }, []);
+
   const dailyAppointments = getAppointmentsForDay(state, state.day);
+
   const interviewersList = getInterviewersForDay(state, state.day);
-        console.log("interviewersList:",interviewersList);
+
   const listAppointments = dailyAppointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
-    return <Appointment
+
+    function bookInterview(id, interview) {
+      const appointment = {
+        ...state.appointments[id],
+        interview: { ...interview }
+      };
+      const appointments = {
+        ...state.appointments,
+        [id]: appointment
+      };
+
+
+      return axios.put(`/api/appointments/${id}`, { interview })
+        .then(() => setState(prevState => ({ ...prevState, appointments })))
+
+    };
+
+    function cancelInterview(id) {
+      const appointment = {
+        ...state.appointments[id],
+        interview: null
+      };
+      const appointments = {
+        ...state.appointments,
+        [id]: appointment
+      };
+      return axios.delete(`/api/appointments/${id}`)
+        .then(() => setState(prevState => ({ ...prevState, appointments })))
+    }
+
+
+    return (<Appointment
       key={appointment.id}
       id={appointment.id}
       time={appointment.time}
       interview={interview}
       interviewers={interviewersList}
+      bookInterview={bookInterview}
+      cancelInterview={cancelInterview}
+
     />
+    )
   });
 
 
@@ -67,7 +103,7 @@ export default function Application(props) {
       </section>
       <section className="schedule">
         {listAppointments}
-        <Appointment key="last" time="5pm"  />
+        <Appointment key="last" time="5pm" />
 
       </section>
     </main>
