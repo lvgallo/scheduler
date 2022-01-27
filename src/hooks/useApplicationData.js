@@ -57,11 +57,11 @@ export default function useApplicationData() {
       ...state.appointments,
       [id]: appointment
     };
-    
+
     updateSpotsOnSave(appointment, id);
 
     return axios.put(`/api/appointments/${id}`, { interview })
-      .then(() => setState(prevState => ({ ...prevState, appointments, spots: prevState - 1 })))
+      .then(() => setState(prevState => ({ ...prevState, appointments })))
 
   };
 

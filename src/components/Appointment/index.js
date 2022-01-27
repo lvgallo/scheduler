@@ -9,8 +9,6 @@ import Error from './Error';
 import "./styles.scss";
 import useVisualMode from "hooks/useVisualMode"
 
-
-
 export default function Appointment(props) {
   const EMPTY = "EMPTY";
   const SHOW = "SHOW";
@@ -39,7 +37,6 @@ export default function Appointment(props) {
       .bookInterview(props.id, interview)
       .then(() => transition(SHOW))
       .catch(error => transition(ERROR_SAVE, true));
-
   }
 
   function deleteInterview(event) {
@@ -95,5 +92,4 @@ export default function Appointment(props) {
 
     </article>
   );
-
 }
